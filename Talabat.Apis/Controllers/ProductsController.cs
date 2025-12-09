@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,23 +20,30 @@ namespace Talabat.APIs.Controllers
         private readonly IProductService _productService;
         private readonly IGenaricRepo<Product> _product_Repo;
         private readonly IMapper _mapper;
-        private readonly IGenaricRepo<Catogary> _catogary_Repo;
-        private readonly IGenaricRepo<Brand> _brand_Repo;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ProductsController(
             IProductService productService,
             IGenaricRepo<Product> Product_Repo,
             IMapper mapper,
-            IGenaricRepo<Catogary> Catogary_Repo,
-            IGenaricRepo<Brand> Brand_Repo
+            IUnitOfWork unitOfWork
             )
         {
             _productService = productService;
             _product_Repo = Product_Repo;
             _mapper = mapper;
-            _catogary_Repo = Catogary_Repo;
-            _brand_Repo = Brand_Repo;
+            _unitOfWork = unitOfWork;
         }
+
+        [HttpPost]
+        public async Task<ActionResult<AddProductDtos>> GreateProduct(AddProductDtos product)
+        {
+            var added = _unitOfWork.Repository<Product>().AddAsync(_mapper.Map<Product>(product));
+            if (!added.IsCompletedSuccessfully)
+                return BadRequest(new ApiRespone(400));
+            return Ok(product);
+        }
+
         [HttpGet]
         public async Task<ActionResult<Pagination<IReadOnlyList<ProductDtos>>>> GetProducts([FromQuery]ProductSpecParams specParams)
         {
@@ -59,6 +66,31 @@ namespace Talabat.APIs.Controllers
 
             return Ok(_mapper.Map<Product, ProductDtos>(product));
         }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteProduct(int id)
+        {
+            var repo = _unitOfWork.Repository<Product>();
+            var product = repo.GetAsync(id);
+            if (product == null)
+                return BadRequest(new ApiRespone(400));
+            var result = repo.Remove(product.Result);
+            if (!result.IsCompletedSuccessfully)
+            {
+                return BadRequest(new ApiRespone(400));
+            }
+            return Ok("deleted successfully");
+        }
+
+        [HttpPost("Category")]
+        public async Task<ActionResult> CreateCategory(CategoryDto category)
+        {
+            var result = _unitOfWork.Repository<Catogary>().AddAsync(_mapper.Map<Catogary>(category));
+            if (!result.IsCompletedSuccessfully)
+                return BadRequest(new ApiRespone(400));
+            return Ok("Added Successfully");
+        }
+
         [HttpGet("Categories")]
         public async Task<ActionResult<IReadOnlyList<Catogary>>> GetCategories()
         {
@@ -67,12 +99,53 @@ namespace Talabat.APIs.Controllers
             return Ok(categories);
 
         }
+        [HttpDelete("Category")]
+        public async Task<ActionResult> DeleteCategory(int id)
+        {
+            var repo = _unitOfWork.Repository<Catogary>();
+            var catogary = repo.GetAsync(id);
+            if (catogary == null)
+                return BadRequest(new ApiRespone(400));
+            var result = repo.Remove(catogary.Result);
+            if (!result.IsCompletedSuccessfully)
+            {
+                return BadRequest(new ApiRespone(400));
+            }
+            return Ok("deleted successfully");
+        }
+
+        [HttpPost("Brand")]
+        public async Task<ActionResult> CreateBrand(BrandDto brand)
+        {
+            var result = _unitOfWork.Repository<Brand>().AddAsync(_mapper.Map<Brand>(brand));
+            if (!result.IsCompletedSuccessfully)
+                return BadRequest(new ApiRespone(400));
+            return Ok("Added Successfully");
+           
+        }
         [HttpGet("Brands")]
         public async Task<ActionResult<IReadOnlyList<Brand>>> GetBrands()
         {
             var brands = await _productService.GetBrandsAsync();
             return Ok(brands);
         }
+
+        [HttpDelete("Brand")]
+        public async Task<ActionResult> DeleteBrand(int id)
+        {
+            var repo = _unitOfWork.Repository<Brand>();
+            var brand = repo.GetAsync(id);
+            if (brand == null)
+                return BadRequest(new ApiRespone(400));
+            var result = repo.Remove(brand.Result);
+            if (!result.IsCompletedSuccessfully)
+            {
+                return BadRequest(new ApiRespone(400));
+            }
+            return Ok("deleted successfully");
+        }
+
+
 
     }
 }
