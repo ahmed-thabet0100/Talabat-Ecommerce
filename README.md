@@ -1,34 +1,30 @@
 # Talabat-Ecommerce
 
-Full-stack **e-commerce web application** built with **.NET Core**.  
-Manage products, orders, and users efficiently with modern architecture and Redis-powered basket storage.
+Full-stack **.NET Core e-commerce web app** with **Redis basket storage**, **Stripe payments**, and **Unit of Work** pattern.
 
 ---
 
-## 🚀 Features
+## Features
 
-- Secure user authentication & authorization  
-- Product catalog with categories, search, **specification filters**  
-- Shopping cart & order management (**Redis** for basket caching)  
-- **Stripe integration** for payments  
-- **Filtering, Sorting & Pagination** for smooth data navigation  
-- Admin panel for product & order management  
-- Clean & maintainable code using **Onion Architecture**  
+- User auth & authorization  
+- Product catalog with filters, search & pagination  
+- Shopping cart & order management  
+- Admin panel for products & orders  
+- Clean code using **Onion Architecture** and **Unit of Work** pattern
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 - **Back-end:** .NET Core Web API  
-- **Architecture:** Onion Architecture (Core, Repositories, Services, APIs)  
 - **Database:** SQL Server  
 - **Caching / Basket:** Redis  
-- **Payment:** Stripe  
+- **Payment:** Stripe
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
-1. Clone the repository:  
+1. Clone the repo:  
 ```bash
 git clone https://github.com/ahmed-thabet0100/Talabat-Ecommerce.git
