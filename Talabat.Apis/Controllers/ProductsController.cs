@@ -35,9 +35,12 @@ namespace Talabat.APIs.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        #region Product
+
         [HttpPost]
-        public async Task<ActionResult<AddProductDtos>> GreateProduct(AddProductDtos product)
+        public async Task<ActionResult<AddProductDtos>> GreateProduct([FromForm] AddProductDtos product)
         {
+            product.PictureUrl = DocumentSetting.UploadFile(product.UploadPicture, "products");
             var added = _unitOfWork.Repository<Product>().AddAsync(_mapper.Map<Product>(product));
             if (!added.IsCompletedSuccessfully)
                 return BadRequest(new ApiRespone(400));
@@ -74,6 +77,7 @@ namespace Talabat.APIs.Controllers
             var product = repo.GetAsync(id);
             if (product == null)
                 return BadRequest(new ApiRespone(400));
+            DocumentSetting.DeleteFile("images",product.Result.PictureUrl);
             var result = repo.Remove(product.Result);
             if (!result.IsCompletedSuccessfully)
             {
@@ -81,6 +85,9 @@ namespace Talabat.APIs.Controllers
             }
             return Ok("deleted successfully");
         }
+        #endregion
+
+        #region Category
 
         [HttpPost("Category")]
         public async Task<ActionResult> CreateCategory(CategoryDto category)
@@ -114,6 +121,9 @@ namespace Talabat.APIs.Controllers
             return Ok("deleted successfully");
         }
 
+        #endregion
+
+        #region Brand
         [HttpPost("Brand")]
         public async Task<ActionResult> CreateBrand(BrandDto brand)
         {
@@ -144,7 +154,7 @@ namespace Talabat.APIs.Controllers
             }
             return Ok("deleted successfully");
         }
-
+        #endregion
 
 
     }
